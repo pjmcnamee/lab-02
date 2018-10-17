@@ -12,7 +12,9 @@ function HornedAnimals(hornedAnimals){
 
 const allHornedAnimals = [];
 
+
 HornedAnimals.prototype.render = function(){
+  console.log(this, 'is rendering');
   $('main').append('<div class="clone"></div>');
   let $hornedAnimalsContainer = $('div[class="clone"]');
 
@@ -34,13 +36,40 @@ let readJSON = function(){
 
     })
 
-  }).then(renderAllHornedAnimals);
+  }).then(renderAllHornedAnimals)
+    .then(createDropDown);
 }
 
 function renderAllHornedAnimals (){
+  // Clear all the divs in main
+  // $('div').remove();
+  $('main').html('');
+
+  let filter = $('select').find(':selected').val();
   allHornedAnimals.forEach(hornedAnimals => {
-    hornedAnimals.render();
-  })
+    console.log(filter);
+    if (filter === hornedAnimals.keyword || filter === 'default') {
+      hornedAnimals.render();
+    }
+  });
+}
+
+function createDropDown() {
+  let usedKeywords = [];
+  allHornedAnimals.forEach(hornedAnimal => {
+    //Have we seen this keyword?
+    if (!usedKeywords.includes(hornedAnimal.keyword)) {
+      // Add keyword to usedKeywords
+      usedKeywords.push(hornedAnimal.keyword);
+      $('select').append(`<option value="${hornedAnimal.keyword}">${hornedAnimal.keyword}</option>`);
+    }
+  } );
+}
+
+function getSelectListener() {
+  $('select').on('change', renderAllHornedAnimals);
 }
 
 readJSON();
+getSelectListener();
+
